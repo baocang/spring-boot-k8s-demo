@@ -1,0 +1,16 @@
+spring:
+  cloud:
+    kubernetes:
+      config:
+        enabled: true
+        namespace: spring-boot-demo
+        name: spring-boot-k8s-demo
+      reload:
+        enabled: true
+        strategy: refresh
+        mode: event
+      client:
+        username: docker-desktop
+        namespace: spring-boot-demo
+  application:
+    name: spring-boot-k8s-demo

@@ -1,0 +1,78 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: spring-boot-k8s-demo
+  namespace: spring-boot-demo
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: spring-boot-k8s-demo
+  namespace: spring-boot-demo
+  labels:
+    app: spring-boot-k8s-demo
+    version: v1
+spec:
+  ports:
+    - name: http
+      port: 8000
+      targetPort: 8000
+  selector:
+    app: spring-boot-k8s-demo
+    version: v1
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spring-boot-k8s-demo
+  namespace: spring-boot-demo
+spec:
+  selector:
+    matchLabels:
+      app: spring-boot-k8s-demo
+      version: v1
+  replicas: 1
+  minReadySeconds: 50
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        app: spring-boot-k8s-demo
+        version: v1
+    spec:
+      serviceAccountName: spring-boot-k8s-demo
+      containers:
+        - image: docker.io/baocang/spring-boot-k8s-demo:0.0.1-SNAPSHOT
+          imagePullPolicy: IfNotPresent
+          startupProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8000
+            initialDelaySeconds: 10
+            failureThreshold: 30
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8000
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8000
+          name: spring-boot-k8s-demo
+          ports:
+            - containerPort: 8000
+          env:
+            - name: TZ
+              value: Asia/Shanghai
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "500m"
+            limits:
+              memory: "1024Mi"
+              cpu: "1000m"

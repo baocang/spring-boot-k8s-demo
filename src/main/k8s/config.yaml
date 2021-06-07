@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: spring-boot-k8s-demo
+  namespace: spring-boot-demo
+data:
+  application.yaml: |-
+    server:
+      port: 8000
+    management:
+      endpoint:
+        health:
+          enabled: true
+    greeting:
+      message: 'Hello from ConfigMap'
